@@ -116,6 +116,7 @@ AM_CPPFLAGS = -Icpp_out -Igrpc_out \
 
 BUILT_SOURCES = $(proto_cpp_files) $(proto_grpc_files)
 
+if WITH_GRPC_SERVER
 if HAVE_GRPC_PY_PLUGIN
 p4pydir = $(pythondir)/p4
 nodist_p4py_PYTHON = \
@@ -181,6 +182,7 @@ $(nodist_googlepy_PYTHON) \
 $(nodist_googlerpcpy_PYTHON) \
 $(nodist_gnmipy_PYTHON)
 endif
+endif
 
 # See http://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
 
@@ -234,7 +236,7 @@ $(BUILT_SOURCES): proto_files.ts
 # executables ended up linking to both libraries which lead to an issue when
 # compiling with clang in optimized mode similar to that one:
 # https://github.com/tensorflow/tensorflow/issues/8394
-if WITH_P4R_SERVER
+if WITH_GRPC_SERVER
 MAYBE_GRPC_LIB = libpiprotogrpc.la
 endif
 lib_LTLIBRARIES = libpiprotobuf.la $(MAYBE_GRPC_LIB)
