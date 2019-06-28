@@ -55,7 +55,7 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y --no-install-recommends $PI_DEPS $PI_RUNTIME_DEPS && \
     ./autogen.sh && \
-    ./configure --enable-Werror --with-bmv2 --with-proto --with-cli --with-internal-rpc --with-sysrepo && \
+    ./configure --enable-Werror --with-bmv2 --with-proto --with-cli --with-internal-rpc --with-sysrepo --with-grpc-server && \
     ./proto/sysrepo/install_yangs.sh && \
     make && \
     make install-strip && \
