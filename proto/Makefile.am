@@ -7,7 +7,11 @@ if WITH_PROTO_DEMO
 MAYBE_PROTO_DEMO = demo_grpc
 endif
 
-SUBDIRS = . third_party p4info frontend server $(MAYBE_PROTO_DEMO) tests
+if WITH_GRPC_SERVER
+MYABE_GRPC_SERVER = server
+endif
+
+SUBDIRS = . third_party p4info frontend $(MYABE_GRPC_SERVER) $(MAYBE_PROTO_DEMO) tests
 
 PROTOFLAGS = -I$(abs_srcdir) -I$(abs_builddir)
 
@@ -187,6 +191,7 @@ proto_files.ts: $(protos)
 	@mkdir -p $(builddir)/cpp_out
 	@mkdir -p $(builddir)/grpc_out
 	$(PROTOC) $^ --cpp_out $(builddir)/cpp_out $(PROTOFLAGS)
+if WITH_GRPC_SERVER
 	$(PROTOC) $^ --grpc_out $(builddir)/grpc_out --plugin=protoc-gen-grpc=$(GRPC_CPP_PLUGIN) $(PROTOFLAGS)
 if HAVE_GRPC_PY_PLUGIN
 	@mkdir -p $(builddir)/py_out
@@ -199,6 +204,7 @@ if HAVE_GRPC_PY_PLUGIN
 	@touch $(builddir)/py_out/p4/config/__init__.py $(builddir)/py_out/p4/config/v1/__init__.py
 	@touch $(builddir)/py_out/p4/tmp/__init__.py
 	@touch $(builddir)/py_out/google/__init__.py $(builddir)/py_out/google/rpc/__init__.py $(builddir)/py_out/gnmi/__init__.py
+endif
 endif
 	@mv -f proto_files.tmp $@
 
@@ -228,7 +234,10 @@ $(BUILT_SOURCES): proto_files.ts
 # executables ended up linking to both libraries which lead to an issue when
 # compiling with clang in optimized mode similar to that one:
 # https://github.com/tensorflow/tensorflow/issues/8394
-lib_LTLIBRARIES = libpiprotobuf.la libpiprotogrpc.la
+if WITH_P4R_SERVER
+MAYBE_GRPC_LIB = libpiprotogrpc.la
+endif
+lib_LTLIBRARIES = libpiprotobuf.la $(MAYBE_GRPC_LIB)
 
 # generated source should not be distributed
 nodist_libpiprotobuf_la_SOURCES = $(proto_cpp_files)

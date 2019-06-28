@@ -27,26 +27,28 @@ dnl readable
 AC_SUBST([PROTOBUF_CFLAGS])
 AC_SUBST([PROTOBUF_LIBS])
 
+AM_CONDITIONAL([WITH_GRPC_SERVER], [test "$with_grpc_server" = yes])
 dnl we need >= 1.3.0 so that binary error details (libgrpc++_error_details) are
 dnl available
-PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.3.0 grpc >= 3.0.0])
-AC_SUBST([GRPC_CFLAGS])
-AC_SUBST([GRPC_LIBS])
+AS_IF([test "$with_grpc_server" = yes], [
+    PKG_CHECK_MODULES([GRPC], [grpc++ >= 1.3.0 grpc >= 3.0.0])
+    AC_SUBST([GRPC_CFLAGS])
+    AC_SUBST([GRPC_LIBS])
+    AC_PATH_PROG([GRPC_CPP_PLUGIN], [grpc_cpp_plugin])
+    AS_IF([test "x$GRPC_CPP_PLUGIN" = x], [
+        AC_MSG_ERROR([grpc_cpp_plugin not found])
+    ])
+    AS_IF([test "$PYTHON" != :], [
+        AC_PATH_PROG([GRPC_PY_PLUGIN], [grpc_python_plugin])
+        AS_IF([test "x$GRPC_PY_PLUGIN" = x], [
+            AC_MSG_WARN([grpc_python_plugin not found, Python code won't be generated])
+        ])
+    ])
+    AM_CONDITIONAL([HAVE_GRPC_PY_PLUGIN], [test "x$GRPC_PY_PLUGIN" != x])
+])
 
 AC_PATH_PROG([PROTOC], [protoc], [])
 AS_IF([test "x$PROTOC" = x], [AC_MSG_ERROR([protoc not found])])
-
-AC_PATH_PROG([GRPC_CPP_PLUGIN], [grpc_cpp_plugin])
-AS_IF([test "x$GRPC_CPP_PLUGIN" = x], [
-    AC_MSG_ERROR([grpc_cpp_plugin not found])
-])
-AS_IF([test "$PYTHON" != :], [
-    AC_PATH_PROG([GRPC_PY_PLUGIN], [grpc_python_plugin])
-    AS_IF([test "x$GRPC_PY_PLUGIN" = x], [
-        AC_MSG_WARN([grpc_python_plugin not found, Python code won't be generated])
-    ])
-])
-AM_CONDITIONAL([HAVE_GRPC_PY_PLUGIN], [test "x$GRPC_PY_PLUGIN" != x])
 
 AX_BOOST_BASE([1.54.0], [], [AC_MSG_ERROR(
               [Please install boost >= 1.54.0 (thread and system)])])

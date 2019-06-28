@@ -53,6 +53,16 @@ AC_ARG_WITH([proto],
                    [Compile p4runtime.proto and associated frontend]),
     [with_proto="$withval"], [with_proto=no])
 
+AC_ARG_WITH([grpc_server],
+    AS_HELP_STRING([--with-grpc-server],
+                   [P4Runtime server support]),
+    [with_grpc_server="$withval"], [with_grpc_server=no])
+
+AS_IF([test "$with_grpc_server" = yes && test "$with_proto" = no], [
+    AC_MSG_NOTICE([proto libraries needed for gRPC server, turning it on])
+    with_proto=yes
+])
+
 AS_IF([test "$with_proto" = yes && test "$want_fe_cpp" = no], [
     AC_MSG_NOTICE([C++ frontend needed for p4runtime.proto, turning it on])
     want_fe_cpp=yes
@@ -61,6 +71,8 @@ AS_IF([test "$with_proto" = yes && test "$want_fe_cpp" = no], [
 AM_CONDITIONAL([WITH_FE_CPP], [test "$want_fe_cpp" = yes])
 
 AM_CONDITIONAL([WITH_PROTO], [test "$with_proto" = yes])
+
+AM_CONDITIONAL([WITH_GRPC_SERVER], [test "$with_grpc_server" = yes])
 # may add other conditions later for GTEST to be compiled if we use GTEST
 # somewhere else
 AM_CONDITIONAL([WITH_GTEST], [test "$with_proto" = yes])
@@ -240,3 +252,4 @@ AS_ECHO("Compile C++ frontend ......................... : $want_fe_cpp")
 AS_ECHO("Compile p4runtime.proto and associated fe .... : $with_proto")
 AS_ECHO("Compile internal RPC ......................... : $with_internal_rpc")
 AS_ECHO("Compile PI C CLI ............................. : $with_cli")
+AS_ECHO("Compile gRPC server........................... : $with_grpc_server")
