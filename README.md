@@ -19,11 +19,12 @@ to install different dependencies.
 | Configure flag        | Default (yes / no) | Dependencies | Remarks |
 | --------------------- | --- | --- | --- |
 | `--with-bmv2`         | no  | bmv2 and its deps | Implies `--with-fe-cpp` |
-| `--with-proto`        | no  | protobuf, grpc, libboost-thread-dev | - |
+| `--with-proto`        | no  | protobuf, libboost-thread-dev | - |
 | `--with-fe-cpp`       | no  | - | - |
 | `--with-internal-rpc` | no  | nanomsg | - |
 | `--with-cli`          | no  | readline | - |
 | `--with-sysrepo`      | no  | same as `--with-proto` + sysrepo and its deps| - |
+| `--with-grpc-server`  | no  | protobuf, grpc, libboost-thread-dev | - |
 
 ### Additional CI tests dependencies
 
